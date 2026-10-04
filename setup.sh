@@ -3,10 +3,17 @@
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
+source "$APP_DIR/lib/common.sh"
+
 VENV_DIR="$APP_DIR/.venv"
 PORT="${PORT:-5000}"
 
 echo "[1/5] Memeriksa prasyarat..."
+require_cmd python3
+require_cmd curl
+port_is_free "$PORT" || die "port $PORT sudah dipakai proses lain"
+
 command -v python3 >/dev/null || { echo "GAGAL: python3 tidak ditemukan."; exit 1; }
 python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)' \
   || { echo "GAGAL: dibutuhkan Python 3.10 atau lebih baru."; exit 1; }
